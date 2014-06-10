@@ -1,0 +1,42 @@
+
+This class provides a friendly interface for the QRS detection. 
+
+If you want to detect QRS complexes given a signal, just clean it (filter it and remove the wandering line) and import a detector from the setDetector module.
+
+It returns the position of all the ECG complexes that it find.
+
+These module uses the rest of packages on this module. The transformations and thresholds are the core of the detector module.
+
+The supervision module's function is the detection and correction of errors in the detection made.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

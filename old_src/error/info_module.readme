@@ -1,0 +1,36 @@
+
+This class provides some functionalities for the evaluation of the quality of a detector and the quality of a classificator.
+
+Some of these functions return just statistical information, others returns the position of the misses and fails.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

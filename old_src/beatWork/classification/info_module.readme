@@ -1,0 +1,37 @@
+
+This module is a bind for machine learning and IA libraries. 
+
+The objects declared in this module have a common interface. Each kind of classifier has its own intializer (depending on the kind of parameters it needs) and a 'predict' method, that returns the prediction according to the trained model.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

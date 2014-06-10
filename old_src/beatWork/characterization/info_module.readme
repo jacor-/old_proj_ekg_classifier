@@ -1,0 +1,45 @@
+
+This module is used for the characterization of the beats of an ECG signal.
+
+The inputs of these clasifiers are one lead signal and the labels of the signal in the typical form:
+
+- positions
+- labels
+
+The decision of how the label's information has to be used has to be token by the developer.
+
+The return type of the signal is a list of N elements. Each one of these elements is the vector of characteristics of each one of the beats labeled in the previous information.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

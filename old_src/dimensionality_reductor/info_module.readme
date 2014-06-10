@@ -1,0 +1,37 @@
+
+This class provides a friendly interface for the reduction of dimensionality of a characterization vector.
+
+The available methods are stored in "reductors" module and have a common interface.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

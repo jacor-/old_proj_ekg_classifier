@@ -1,0 +1,4 @@
+
+This class provides a friendly interface for the QRS cleaning. 
+
+In this module you can find functions for filtering and baseline wander remove.

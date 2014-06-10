@@ -1,0 +1,14 @@
+
+The tainer module provides a class for the training and the prediction using a defined method.
+
+The trainer requires a name (important!, it has to be unique!!! If anyone tester has the same name, it will be overwritten!), and a characterizator system.
+
+The characterizator system has to define the pipeline used for characterize each beat.
+
+The system has to be trained and can be saved.
+
+If you want to use a trained system in future, just create a trainer instance and invoque the Load method. The name with the same name will be restored if it was saved after it was trained.
+
+In order to use the trainer instance, just characterize a new and not labeled signal and call the predict method of the trainer for predict these unknown samples.
+
+In test module there are some examples explaining how to use this trainer.

@@ -1,0 +1,80 @@
+[1;31mType:       [0minstancemethod
+[1;31mBase Class: [0m<type 'instancemethod'>
+[1;31mString Form:[0m<bound method Figure.add_subplot of <matplotlib.figure.Figure object at 0x211f0490>>
+[1;31mNamespace:  [0mInteractive
+[1;31mFile:       [0m/usr/lib/pymodules/python2.6/matplotlib/figure.py
+[1;31mDefinition: [0m[0mfig[0m[1;33m.[0m[0madd_subplot[0m[1;33m([0m[0mself[0m[1;33m,[0m [1;33m*[0m[0margs[0m[1;33m,[0m [1;33m**[0m[0mkwargs[0m[1;33m)[0m[1;33m[0m[0m
+[1;31mDocstring:[0m
+Add a subplot.  Examples:
+
+    fig.add_subplot(111)
+    fig.add_subplot(1,1,1)            # equivalent but more general
+    fig.add_subplot(212, axisbg='r')  # add subplot with red background
+    fig.add_subplot(111, polar=True)  # add a polar subplot
+    fig.add_subplot(sub)              # add Subplot instance sub
+
+*kwargs* are legal :class:`!matplotlib.axes.Axes` kwargs plus
+*projection*, which chooses a projection type for the axes.
+(For backward compatibility, *polar=True* may also be
+provided, which is equivalent to *projection='polar'*). Valid
+values for *projection* are: aitoff, hammer, lambert, mollweide, polar, rectilinear.  Some of these projections
+support additional *kwargs*, which may be provided to
+:meth:`add_axes`.
+
+The :class:`~matplotlib.axes.Axes` instance will be returned.
+
+If the figure already has a subplot with key (*args*,
+*kwargs*) then it will simply make that subplot current and
+return it.
+
+The following kwargs are supported:
+
+  adjustable: [ 'box' | 'datalim' ]         
+  alpha: float (0.0 transparent through 1.0 opaque)         
+  anchor: unknown
+  animated: [True | False]         
+  aspect: unknown
+  autoscale_on: unknown
+  autoscalex_on: unknown
+  autoscaley_on: unknown
+  axes: an :class:`~matplotlib.axes.Axes` instance         
+  axes_locator: unknown
+  axis_bgcolor: any matplotlib color - see         :func:`~matplotlib.pyplot.colors`         
+  axis_off: unknown
+  axis_on: unknown
+  axisbelow: [ *True* | *False* ]         
+  clip_box: a :class:`matplotlib.transforms.Bbox` instance         
+  clip_on: [True | False]         
+  clip_path: [ (:class:`~matplotlib.path.Path`,         :class:`~matplotlib.transforms.Transform`) |         :class:`~matplotlib.patches.Patch` | None ]         
+  color_cycle: unknown
+  contains: a callable function         
+  cursor_props: a (*float*, *color*) tuple         
+  figure: unknown
+  frame_on: [ *True* | *False* ]         
+  gid: an id string         
+  label: any string         
+  lod: [True | False]         
+  navigate: [ True | False ]         
+  navigate_mode: unknown
+  picker: [None|float|boolean|callable]         
+  position: unknown
+  rasterization_zorder: unknown
+  rasterized: [True | False | None]         
+  snap: unknown
+  title: str
+  transform: :class:`~matplotlib.transforms.Transform` instance         
+  url: a url string         
+  visible: [True | False]         
+  xbound: unknown
+  xlabel: str
+  xlim: len(2) sequence of floats         
+  xscale: ['linear' | 'log' | 'symlog']
+  xticklabels: sequence of strings
+  xticks: sequence of floats         
+  ybound: unknown
+  ylabel: str
+  ylim: len(2) sequence of floats         
+  yscale: ['linear' | 'log' | 'symlog']
+  yticklabels: sequence of strings
+  yticks: sequence of floats
+  zorder: any number         

@@ -18,20 +18,27 @@ def __getDataOfASignal__(case):
         now_beats.append((new_beat.reshape(3*(window[1]-window[0])), lab))
     return now_beats
 
+import futures
 def __getData__(cases):
     data = []
-    for case in cases:
-        data += __getDataOfASignal__(case)
+    executor = futures.ThreadPoolExecutor(max_workers=8)
+    futs = [executor.submit(__getDataOfASignal__, case) for case in cases]
+    current = 0
+    total = len(futs)
+    for fut in futures.as_completed(futs):
+        current += 1
+        print str(float(current)/total*100)
+        data += fut.result()
     __randomizeData__(data)
     beats, labels = zip(*data)
     return np.array(beats), labels
 
 def getTrainData(ids_train):
-    beats_train, labels_train = __getData__(ids_train[:3])    
+    beats_train, labels_train = __getData__(ids_train)    
     return beats_train, labels_train
 
 def getTestData(ids_test):
-    beats_test, labels_test = __getData__(ids_test[:3])
+    beats_test, labels_test = __getData__(ids_test)
     return beats_test, labels_test
 
 def getData(ids_train, ids_test):

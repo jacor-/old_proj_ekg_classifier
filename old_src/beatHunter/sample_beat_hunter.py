@@ -70,7 +70,7 @@ def sampleBeatHunterLikelihoodPFC(signal, begin,  end, referencies, RR_estimat, 
     pics = array(_buscaPics(alRescate, int(round(float(end-begin+1)/RR_estimat + 2)), 20, left = RR_estimat*0.65, right = RR_estimat*0.65))+10
     candidats =  _esBatec(signal[begin:end], pics, referencies[0], index)
     
-    from qrsDetector.utils import recoloca
+    from old_src.qrsDetector.utils import recoloca
     reload(recoloca)
     candidats2 = recoloca.recoloca2(signal, candidats)
     

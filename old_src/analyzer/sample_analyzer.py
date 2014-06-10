@@ -42,7 +42,7 @@ def analyze(signal, f_tall, deep_iteration, previousCandidates, refference_beats
     STEP 1:
     First of all we have to clean the signal.
     '''    
-    import signalCleaning.sample as cleaner
+    import old_src.signalCleaning.sample as cleaner
     reload(cleaner)
     clean_sample, f_tall = cleaner.sampleCleaner(signal, f_tall)
 
@@ -50,7 +50,7 @@ def analyze(signal, f_tall, deep_iteration, previousCandidates, refference_beats
     STEP 2:
     Candidates detection
     '''
-    import qrsDetector.sample as sampleDetector
+    import old_src.qrsDetector.sample as sampleDetector
     reload(sampleDetector)
     outputData, beatsPosition, beatInformation = sampleDetector.sampleDetector(clean_sample)
 
@@ -59,7 +59,7 @@ def analyze(signal, f_tall, deep_iteration, previousCandidates, refference_beats
     STEP 3:
     Candidates characterization
     '''
-    import beatWork.characterization.sample as charact
+    import old_src.beatWork.characterization.sample as charact
     reload(charact)
     beatsChar, beatsPosition = charact.sampleCharacterizator(clean_sample, beatsPosition, beatInformation, normalize = False)
     
@@ -69,7 +69,7 @@ def analyze(signal, f_tall, deep_iteration, previousCandidates, refference_beats
     '''
     #import cPickle
     #if deep_iteration != -1:
-    import beatWork.identification.sample as identification
+    import old_src.beatWork.identification.sample as identification
     reload(identification)
     
     real_pos_beats, ident_quality, ventriculars = identification.identification(beatsChar, beatsPosition, lead_name = kwargs['lead_name'])
@@ -78,7 +78,7 @@ def analyze(signal, f_tall, deep_iteration, previousCandidates, refference_beats
     STEP 5:
     QualityPerZoneStimation
     '''
-    import zoneQualityStimation.penalizedZoneQualityStimation as qualityStimator
+    import old_src.zoneQualityStimation.penalizedZoneQualityStimation as qualityStimator
     reload(qualityStimator)
     delimiters, zone_quality = qualityStimator.sampleZoneQualityEstimation(clean_sample, 0, len(clean_sample), beatsPosition = real_pos_beats, deep_rec = deep_iteration)
     #return real_pos_beats, zone_quality

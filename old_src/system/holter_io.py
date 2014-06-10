@@ -1,13 +1,13 @@
 import struct
 from numpy import array
-from settings import *
+import settings
 from os import listdir
 import subprocess
 #path_mdb = '/home/jose/.gvfs/temp en srvgm001/Jose/Sint/'
 
 def _get_signal_filename(examId):
 
-    path_mdb = MDB_PATH + 'CardioMg.mdb'
+    path_mdb = settings.MDB_PATH + 'CardioMg.mdb'
     f = open(path_mdb, 'r')
 
     linea = ["mdb-export",path_mdb,"Signals", "-H"]
@@ -52,11 +52,11 @@ def _get_signal_filename(examId):
 
 def _get_part_of_signal(exam_id, first_sample = 0, last_sample = 0):
     import os
-    filename = FULL_SIGNAL_PATH + _get_signal_filename(exam_id)+'.Hfd'
+    filename = settings.FULL_SIGNAL_PATH + _get_signal_filename(exam_id)+'.Hfd'
     
-    f1 = open(RESUMED_SIGNAL_PATH + exam_id+'_1.pfc_data','wb')
-    f2 = open(RESUMED_SIGNAL_PATH + exam_id+'_2.pfc_data','wb')
-    f3 = open(RESUMED_SIGNAL_PATH + exam_id+'_3.pfc_data','wb')
+    f1 = open(settings.RESUMED_SIGNAL_PATH + exam_id+'_1.pfc_data','wb')
+    f2 = open(settings.RESUMED_SIGNAL_PATH + exam_id+'_2.pfc_data','wb')
+    f3 = open(settings.RESUMED_SIGNAL_PATH + exam_id+'_3.pfc_data','wb')
     
     f = open(filename, 'rb')
     aux = f.read(1)
@@ -82,7 +82,7 @@ def _get_part_of_signal(exam_id, first_sample = 0, last_sample = 0):
     f.close() 
 
 def _read_full_labels(exam_id, diagnoser = 'cardiosManager'):
-    f = open(FULL_DIAGNOSE_PATH + diagnoser + '/'+exam_id +'.txt','r')
+    f = open(settings.FULL_DIAGNOSE_PATH + diagnoser + '/'+exam_id +'.txt','r')
     lab = []
     points = []
     for x in f.readlines():
@@ -121,7 +121,7 @@ def prepare_labels(labeler,exam_id, index_inici, index_final, first_sample, last
     points, lab = _read_full_labels(exam_id, labeler)    
     new_labels = array(lab[index_inici:index_final])
     new_points = array(points[index_inici:index_final])-first_sample
-    f = open(RESUMED_DIAGNOSES_PATH+labeler+'/'+exam_id+'.txt', 'w')
+    f = open(settings.RESUMED_DIAGNOSES_PATH+labeler+'/'+exam_id+'.txt', 'w')
     for i in range(len(new_labels)):
         f.write(str(new_labels[i]) + ','+str(new_points[i])+'\n')
     f.close()
@@ -130,7 +130,7 @@ def prepare_signal(exam_id, first_sample, last_sample):
     _get_part_of_signal(exam_id, first_sample, last_sample)
 
 def read_labels(exam_id, diagnoser = 'cardiosManager'):
-    f = open(RESUMED_DIAGNOSES_PATH + diagnoser + '/'+exam_id +'.txt','r')
+    f = open(settings.RESUMED_DIAGNOSES_PATH + diagnoser + '/'+exam_id +'.txt','r')
     lab = []
     points = []
     for x in f.readlines():
@@ -142,9 +142,9 @@ def read_labels(exam_id, diagnoser = 'cardiosManager'):
 
 def read_data(id_exam):
     data = [[],[],[]]
-    f1 = open(RESUMED_SIGNAL_PATH + id_exam+'_1.pfc_data','rb')
-    f2 = open(RESUMED_SIGNAL_PATH + id_exam+'_2.pfc_data','rb')
-    f3 = open(RESUMED_SIGNAL_PATH + id_exam+'_3.pfc_data','rb')
+    f1 = open(settings.RESUMED_SIGNAL_PATH + id_exam+'_1.pfc_data','rb')
+    f2 = open(settings.RESUMED_SIGNAL_PATH + id_exam+'_2.pfc_data','rb')
+    f3 = open(settings.RESUMED_SIGNAL_PATH + id_exam+'_3.pfc_data','rb')
     
     aux = f1.read(1)
     while aux != '':
@@ -166,8 +166,8 @@ def get_complete_exam(id_exam, diagnoser):
     points, labels = read_labels(id_exam, diagnoser)
     from numpy import array,zeros,dot,argmax,abs,mean
     
-    from signalCleaning.cleaners import lowpass
-    from signalCleaning import cleaners
+    from old_src.signalCleaning.cleaners import lowpass
+    from old_src.signalCleaning import cleaners
     
     
     
@@ -189,7 +189,7 @@ def get_complete_exam_filtrado(id_exam, diagnoser):
 def import_signals():
     error = []
     usable = []
-    for i in listdir(FULL_DIAGNOSE_PATH+'jose_diagnose_24:02:2012/'):
+    for i in listdir(settings.FULL_DIAGNOSE_PATH+'jose_diagnose_24:02:2012/'):
         id_exam = i[:-4]   
         print id_exam
         index_inici, index_final, first_sample, last_sample = get_positional_refference(id_exam)
@@ -202,15 +202,18 @@ def import_signals():
             usable.append(id_exam)
         print "  ... Preparing signal"
         prepare_signal(id_exam, first_sample, last_sample)
-    f = open(INTERNAL_INFO+"error:signals", 'w')
+    f = open(settings.INTERNAL_INFO+"error:signals", 'w')
     f.write(str(error))
     f.close()
-    f = open(INTERNAL_INFO+"usable:signals", 'w')
+    f = open(settings.INTERNAL_INFO+"usable:signals", 'w')
     f.write(str(usable))
     f.close()
 
+
+'''
 def import_diagnoses(new_diagnoser, path_mdb = ''):
-    '''
+'''
+'''
     If you are interested in use your own diagnoses with our system, you just have to call this function providing the path where you have stored all you .mdb files and the name with this name is going to be known by.
     If your mdb files have already been imported, you just have to omit the path_mdb parameter.
     
@@ -219,9 +222,10 @@ def import_diagnoses(new_diagnoser, path_mdb = ''):
         import_diagnoses('cardiosManager')
         import_diagnoses('jose_diagnose_24:02:2012')
         
-    ''' 
+''' 
+'''
     if(path_mdb != ''):
-        import mdb_diagnoser_exporter
+        import old_src.mdb_diagnoser_exporter as mdb_diagnoser_exporter
         mdb_diagnoser_exporter.generaNouDiagnosticador(path_mdb, new_diagnoser)
     error = []
     usable = []
@@ -244,12 +248,12 @@ def import_diagnoses(new_diagnoser, path_mdb = ''):
     f = open(INTERNAL_INFO+"usable:"+new_diagnoser, 'w')
     f.write(str(usable))
     f.close()
-
+'''
 def get_usable_cases(diagnoser):
-    f = open(INTERNAL_INFO+"usable:"+diagnoser, 'r')
+    f = open(settings.INTERNAL_INFO+"usable_"+diagnoser, 'r')
     usables = eval(f.readline())
     f.close()
-    f = open(INTERNAL_INFO+"usable:signals", 'r')
+    f = open(settings.INTERNAL_INFO+"usable_signals", 'r')
     signals = eval(f.readline())
     f.close()
     return [x for x in usables if x in signals]

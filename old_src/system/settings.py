@@ -1,5 +1,6 @@
 
-ROOT_PATH = "C:/Users/jacordero/Desktop/Gem-Med Pruebas/Old Gem-Med Project/dades/"
+#ROOT_PATH = "C:/Users/jacordero/Desktop/Gem-Med Pruebas/Old Gem-Med Project/dades/"
+ROOT_PATH = "/home/gemmed/gitRepos/gemmedData/dades/"
 FULL_SIGNAL_PATH = '/media/OS/holter_pfc/holters_signal/'
 FULL_DIAGNOSE_PATH = '/media/OS/holter_pfc/holters_complete_diagnose/'
 RESUMED_DIAGNOSES_PATH = ROOT_PATH + 'diagnoses/'

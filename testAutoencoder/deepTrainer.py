@@ -302,9 +302,7 @@ class Autoencoder(object):
         print "Saving files..."
         #numpy.save(weights_file, self.params[0].get_value())
         return ae_costs
-    
-    def save(self, filename):
-        
+            
 
     def reconstruct(self, data_in):
         x_x = T.matrix('x_input')

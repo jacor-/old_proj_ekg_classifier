@@ -6,6 +6,13 @@ import old_src.signalCleaning.cleaners as cleaners
 def __randomizeData__(beats):
     np.random.shuffle(beats)
     
+def getDataAndLabels(case):
+    data,labs = holter_utils.get_complete_exam(case,'cardiosManager') 
+    data[0] = cleaners.hp(data[0], 0.6)
+    data[1] = cleaners.hp(data[1], 0.6)
+    data[2] = cleaners.hp(data[2], 0.6)
+    return data, labs
+
 def __getDataOfASignal__(case):
     data,labs = holter_utils.get_complete_exam(case,'cardiosManager') 
     data[0] = cleaners.hp(data[0], 0.6)

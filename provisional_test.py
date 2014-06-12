@@ -4,7 +4,7 @@ import old_src.system.holter_io as holter_utils
 from numpy import array
 from dataset_utils.getData import getData, getDataAndLabels
 from dataset_utils.GetTrainAndTestSets import getSignalsTrainTest
-import statsmodels.api as sm
+#import statsmodels.api as sm
 cases = holter_utils.get_usable_cases('cardiosManager')
 ids_train, ids_test = getSignalsTrainTest(cases)
 #beats_train, beats_test, labels_train, labels_test = getData([ids_train[0]], [ids_test[0]])
@@ -32,6 +32,6 @@ def caracterizeBeats(cases):
                 labels.append(2)
     return beats, labels
 
-beats_train, labels_train = caracterizeBeats(ids_train[:5])
-beats_test, labels_test = caracterizeBeats(ids_test[:5])
+beats_train, labels_train = caracterizeBeats(ids_train)
+beats_test, labels_test = caracterizeBeats(ids_test)
 

@@ -40,16 +40,12 @@ def __getData__(cases):
     beats, labels = zip(*data)
     return np.array(beats), labels
 
-def getTrainData(ids_train):
+def getIdsData(ids_train):
     beats_train, labels_train = __getData__(ids_train)    
     return beats_train, labels_train
 
-def getTestData(ids_test):
-    beats_test, labels_test = __getData__(ids_test)
-    return beats_test, labels_test
-
 def getData(ids_train, ids_test):
-    beats_train, labels_train = getTrainData(ids_train)
-    beats_test, labels_test = getTrainData(ids_test)
+    beats_train, labels_train = getIdsData(ids_train)
+    beats_test, labels_test = getIdsData(ids_test)
     return beats_train, beats_test, labels_train, labels_test
   

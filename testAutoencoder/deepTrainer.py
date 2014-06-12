@@ -302,7 +302,9 @@ class Autoencoder(object):
         print "Saving files..."
         #numpy.save(weights_file, self.params[0].get_value())
         return ae_costs
-
+    
+    def save(self, filename):
+        
 
     def reconstruct(self, data_in):
         x_x = T.matrix('x_input')
@@ -378,7 +380,7 @@ f.close()
 
 
 
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, f1_score
 def doIt(X_train, Y_train, X_valid, Y_valid, transformation, clf):
     clf.fit(transformation(X_train), Y_train)
     pred1 = clf.predict(transformation(X_valid))
@@ -394,7 +396,7 @@ valid = [X_valid]
 
 for i in range(len(autoencoders)):
     print "autoencoder " + str(i) + " of " + str(len(autoencoders))
-    aux = autoencoders[i].fit(data = tests[-1], learning_rate = 0.01, batch_size = 128, n_epochs = 100)
+    aux = autoencoders[i].fit(data = tests[-1], learning_rate = 0.01, batch_size = 128, n_epochs = 100 / (i+1))
     #aux = autoencoders[i].fit(data = tests[-1], learning_rate = 0.01 * 7, batch_size = 128*7, n_epochs = 20)
     #aux = autoencoders[i].fit(data = tests[-1], learning_rate = 0.01 * 4, batch_size = 128*4, n_epochs = 20)
     #aux = autoencoders[i].fit(data = tests[-1], learning_rate = 0.01 * 2, batch_size = 128*2, n_epochs = 20)
@@ -404,7 +406,7 @@ for i in range(len(autoencoders)):
     valid.append(autoencoders[i].project(valid[-1]))
     #sss = autoencoder2.fit(data = X_train, learning_rate = 0.1, batch_size = 128, n_epochs = 2)
 
-    
+
 from sklearn.svm import SVC
-print "      -- Quality rara: " + str(doIt(tests[-1], Y_train, valid[-1], Y_valid, lambda x: x, SVC()))
+#print "      -- Quality rara: " + str(doIt(tests[-1], Y_train, valid[-1], Y_valid, lambda x: x, SVC()))
 

@@ -2,7 +2,7 @@ import theano
 import theano.tensor as T
 from theano.tensor.shared_randomstreams import RandomStreams
 
-from layer import AEHiddenLayer
+from testAutoencoder.layer import AEHiddenLayer
 import numpy
 
 from collections import OrderedDict

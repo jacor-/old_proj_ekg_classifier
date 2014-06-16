@@ -150,28 +150,68 @@ batch_size = 128
 
 
 visible_size = X_train.shape[1]
-hidden_size = 250
+hidden_size = 300
 pa = ScratchAutoencoder(visible_size, hidden_size, ac, N_classes = 2)
 costs = []
 
+print "LAYER 1"
+print "  -- step 1"
 for epoch in range(10):
     costs.append( pa.train_autoencoder(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-for epoch in range(10):
+print "  -- step 2"
+for epoch in range(3):
     costs.append( pa.train_backpropagation(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+print "  -- step 3"
 for epoch in range(10):
     costs.append( pa.train(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
 
 
 visible_size2 = hidden_size
-hidden_size2 = 10
+hidden_size2 = 200
 pa2 = ScratchAutoencoder(visible_size2, hidden_size2, 1., N_classes = 2)
 costs2 = []
+print "LAYER 2"
+print "  -- step 1"
 for epoch in range(10):
-    costs.append( pa2.train_autoencoder(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-for epoch in range(10):
-    costs.append( pa2.train_backpropagation(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+    costs2.append( pa2.train_autoencoder(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+print "  -- step 2"
+for epoch in range(3):
+    costs2.append( pa2.train_backpropagation(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+print "  -- step 3"
 for epoch in range(10):
     costs2.append( pa2.train(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+
+
+visible_size3 = hidden_size2
+hidden_size3 = 100
+pa3 = ScratchAutoencoder(visible_size3, hidden_size3, 1., N_classes = 2)
+costs3 = []
+print "LAYER 3"
+print "  -- step 1"
+for epoch in range(10):
+    costs3.append( pa3.train_autoencoder(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64))), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+print "  -- step 2"
+for epoch in range(3):
+    costs3.append( pa3.train_backpropagation(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64))), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+print "  -- step 3"
+for epoch in range(10):
+    costs3.append( pa3.train(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64))), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+
+
+visible_size4 = hidden_size3
+hidden_size4 = 10
+pa4 = ScratchAutoencoder(visible_size4, hidden_size4, 1., N_classes = 2)
+costs2 = []
+print "LAYER 4"
+print "  -- step 1"
+for epoch in range(10):
+    costs.append( pa3.train_autoencoder(pa3.project(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64)))), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+print "  -- step 2"
+for epoch in range(3):
+    costs.append( pa2.train_backpropagation(pa3.project(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64)))), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+print "  -- step 3"
+for epoch in range(10):
+    costs2.append( pa2.train(pa3.project(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64)))), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
 
 
 

@@ -64,7 +64,7 @@ class ScratchAutoencoder():
         self.f_train = theano.function([XX,YY,index], monitorize, updates=updates, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
         self.f_monit = theano.function([XX, YY], monitorize, givens = {self.X: XX, self.y: YY}, on_unused_input='warn')
 
-        params2 = [We,be,Wc,bc]
+        params2 = [Wc,bc]
         cost_bp = theano.tensor.mean(a_rate * Er_clas)
         grads2 = theano.tensor.grad(cost_bp, params2)
         updates2 = [(param, param - self.learning_rate * grad) for grad,param in zip(grads2, params2)]
@@ -99,20 +99,12 @@ class ScratchAutoencoder():
             a.append(self.f_train(train_data,labels,i))        
         print str(numpy.mean(numpy.array(a),axis=0))
         return numpy.mean(numpy.array(a),axis=0)
-
         
     def project(self, data):
         return self._project(data)
         
     def reconstruct(self,data):
         return self._reconstruct(data)
-    
-    def train(self, train_data, labels, batch_size, learning_rate): 
-        a = []
-        for i in range(len(train_data)/batch_size):
-            a.append(self.f_train(train_data,labels,i))        
-        print str(numpy.mean(numpy.array(a),axis=0))
-        return numpy.mean(numpy.array(a),axis=0)
 
 
 
@@ -161,24 +153,25 @@ visible_size = X_train.shape[1]
 hidden_size = 250
 pa = ScratchAutoencoder(visible_size, hidden_size, ac, N_classes = 2)
 costs = []
-#for epoch in range(10):
-#    costs.append( pa.train(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-#for epoch in range(10):
-#    costs.append( pa.train_autoencoder(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-for epoch in range(30):
+
+for epoch in range(10):
+    costs.append( pa.train_autoencoder(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+for epoch in range(10):
     costs.append( pa.train_backpropagation(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+for epoch in range(10):
+    costs.append( pa.train(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
 
 
 visible_size2 = hidden_size
 hidden_size2 = 10
 pa2 = ScratchAutoencoder(visible_size2, hidden_size2, 1., N_classes = 2)
 costs2 = []
-#for epoch in range(10):
-#    costs2.append( pa2.train(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-#for epoch in range(10):
-#    costs.append( pa2.train_autoencoder(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+for epoch in range(10):
+    costs.append( pa2.train_autoencoder(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
 for epoch in range(10):
     costs.append( pa2.train_backpropagation(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+for epoch in range(10):
+    costs2.append( pa2.train(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
 
 
 

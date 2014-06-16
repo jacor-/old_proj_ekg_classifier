@@ -394,7 +394,7 @@ valid = [X_valid]
 
 for i in range(len(autoencoders)):
     print "autoencoder " + str(i) + " of " + str(len(autoencoders))
-    aux = autoencoders[i].fit(data = tests[-1], learning_rate = 0.01, batch_size = 128, n_epochs = 100 / (i+1))
+    aux = autoencoders[i].fit(data = tests[-1], learning_rate = 0.01, batch_size = 128, n_epochs = 100)
     #aux = autoencoders[i].fit(data = tests[-1], learning_rate = 0.01 * 7, batch_size = 128*7, n_epochs = 20)
     #aux = autoencoders[i].fit(data = tests[-1], learning_rate = 0.01 * 4, batch_size = 128*4, n_epochs = 20)
     #aux = autoencoders[i].fit(data = tests[-1], learning_rate = 0.01 * 2, batch_size = 128*2, n_epochs = 20)

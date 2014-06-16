@@ -68,13 +68,13 @@ class ScratchAutoencoder():
         cost_bp = theano.tensor.mean(a_rate * Er_clas)
         grads2 = theano.tensor.grad(cost_bp, params2)
         updates2 = [(param, param - self.learning_rate * grad) for grad,param in zip(grads2, params2)]
-        self.f_train_backpropagation = theano.function([XX,YY,index], self.monitorize, updates=updates2, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
+        self.f_train_backpropagation = theano.function([XX,YY,index], monitorize, updates=updates2, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
 
         params3 = [We,be,Wd,bd]
         cost_aut = theano.tensor.mean(Er_rec)
         grads3 = theano.tensor.grad(cost_aut, params3)
         updates3 = [(param, param - self.learning_rate * grad) for grad,param in zip(grads3, params3)]
-        self.f_train_autoencoder = theano.function([XX,YY,index], self.monitorize, updates=updates3, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
+        self.f_train_autoencoder = theano.function([XX,YY,index], monitorize, updates=updates3, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
 
 
         #self.monit2 = theano.function([XX,YY], [h,self.y, theano.tensor.nnet.categorical_crossentropy(h,self.y)], givens = {self.X : XX , self.y : YY})

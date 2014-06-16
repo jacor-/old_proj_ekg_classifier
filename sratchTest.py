@@ -48,29 +48,56 @@ class ScratchAutoencoder():
         h = theano.tensor.nnet.softmax(theano.tensor.dot(z,Wc)+bc)
         Er_clas = theano.tensor.nnet.categorical_crossentropy(h, self.y)
 
-        cost = theano.tensor.mean(Er_rec + a_rate * Er_clas)
-
         params = [We,be,Wd,bd,Wc,bc]
-        params = [We,be,Wd,bd]
-        grads = theano.tensor.grad(cost, params)
-        self.learning_rate = theano.tensor.dscalar()
-        updates = [(param, param - self.learning_rate * grad) for grad,param in zip(grads, params)]
-        
-        
-        self.updates = updates
-        self.cost = cost
         self.params = params
 
-        self.monitorize = [theano.tensor.mean(Er_rec), a_rate * theano.tensor.mean(Er_clas), cost]
-        #self.monitorize = [theano.tensor.mean(Er_rec), cost]
-
-        index = theano.tensor.lscalar()
         XX = theano.tensor.matrix()
         YY = theano.tensor.matrix()
-        self.f_train = theano.function([XX,YY,index], self.monitorize, updates=self.updates, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
-        self.f_monit = theano.function([XX, YY], self.monitorize, givens = {self.X: XX, self.y: YY}, on_unused_input='warn')
+        self.learning_rate = theano.tensor.dscalar()
+        index = theano.tensor.lscalar()
+        
+        cost1 = theano.tensor.mean(Er_rec + a_rate * Er_clas)
+        grads1 = theano.tensor.grad(cost1, params)
+        updates = [(param, param - self.learning_rate * grad) for grad,param in zip(grads1, params)]
+        
+        monitorize = [theano.tensor.mean(Er_rec), a_rate * theano.tensor.mean(Er_clas), cost1]
+        self.f_train = theano.function([XX,YY,index], monitorize, updates=updates, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
+        self.f_monit = theano.function([XX, YY], monitorize, givens = {self.X: XX, self.y: YY}, on_unused_input='warn')
+
+        cost_bp = theano.tensor.mean(a_rate * Er_clas)
+        grads2 = theano.tensor.grad(cost_bp, params)
+        updates2 = [(param, param - self.learning_rate * grad) for grad,param in zip(grads2, params)]
+        self.f_train_backpropagation = theano.function([XX,YY,index], self.monitorize, updates=updates2, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
+
+        cost_aut = theano.tensor.mean(Er_rec)
+        grads3 = theano.tensor.grad(cost_aut, params)
+        updates3 = [(param, param - self.learning_rate * grad) for grad,param in zip(grads3, params)]
+        self.f_train_autoencoder = theano.function([XX,YY,index], self.monitorize, updates=updates3, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
+
 
         #self.monit2 = theano.function([XX,YY], [h,self.y, theano.tensor.nnet.categorical_crossentropy(h,self.y)], givens = {self.X : XX , self.y : YY})
+
+    def train_backpropagation(self, train_data, labels, batch_size, learning_rate): 
+        a = []
+        for i in range(len(train_data)/batch_size):
+            a.append(self.f_train_backpropagation(train_data,labels,i))        
+        print str(numpy.mean(numpy.array(a),axis=0))
+        return numpy.mean(numpy.array(a),axis=0)
+
+    def train_autoencoder(self, train_data, labels, batch_size, learning_rate): 
+        a = []
+        for i in range(len(train_data)/batch_size):
+            a.append(self.f_train_autoencoder(train_data,labels,i))        
+        print str(numpy.mean(numpy.array(a),axis=0))
+        return numpy.mean(numpy.array(a),axis=0)
+
+    def train(self, train_data, labels, batch_size, learning_rate): 
+        a = []
+        for i in range(len(train_data)/batch_size):
+            a.append(self.f_train(train_data,labels,i))        
+        print str(numpy.mean(numpy.array(a),axis=0))
+        return numpy.mean(numpy.array(a),axis=0)
+
         
     def project(self, data):
         return self._project(data)
@@ -79,16 +106,11 @@ class ScratchAutoencoder():
         return self._reconstruct(data)
     
     def train(self, train_data, labels, batch_size, learning_rate): 
-        #XX = theano.shared(train_data)
-        #YY = theano.shared(labels)
         a = []
-        #print str(self.monit2(train_data, labels))
         for i in range(len(train_data)/batch_size):
-             a.append(self.f_train(train_data,labels,i))
-        
+            a.append(self.f_train(train_data,labels,i))        
         print str(numpy.mean(numpy.array(a),axis=0))
         return numpy.mean(numpy.array(a),axis=0)
-        #return self.f_monit(train_data, labels)
 
 
 
@@ -137,16 +159,22 @@ visible_size = X_train.shape[1]
 hidden_size = 250
 pa = ScratchAutoencoder(visible_size, hidden_size, ac, N_classes = 2)
 costs = []
-for epoch in range(100):
+for epoch in range(10):
     costs.append( pa.train(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+for epoch in range(10):
+    costs.append( pa.train_autoencoder(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+for epoch in range(10):
+    costs.append( pa.train_backpropagation(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
 
 
 visible_size2 = hidden_size
 hidden_size2 = 10
 pa2 = ScratchAutoencoder(visible_size2, hidden_size2, 1., N_classes = 2)
 costs2 = []
-for epoch in range(100):
+for epoch in range(10):
     costs2.append( pa2.train(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+
+
 
 
 import numpy

@@ -142,8 +142,18 @@ for epoch in range(10):
 
 
 visible_size2 = hidden_size
-hidden_size2 = 2
+hidden_size2 = 10
 pa2 = ScratchAutoencoder(visible_size2, hidden_size2, 1., N_classes = 2)
 costs2 = []
 for epoch in range(10):
     costs2.append( pa2.train(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
+
+
+import numpy
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import classification_report
+clf = KNeighborsClassifier(n_neighbors = 10)
+clf.fit(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64))), Y_train)
+pred = clf.predict(pa2.project(pa.project(numpy.matrix(X_valid, dtype=numpy.float64))))
+print classification_report(pred, Y_valid)
+

@@ -51,6 +51,7 @@ class ScratchAutoencoder():
 
         XX = theano.tensor.matrix()
         YY = theano.tensor.matrix()
+        _learning_rate = theano.tensor.dscalar()
         self.learning_rate = theano.tensor.dscalar()
         index = theano.tensor.lscalar()
         
@@ -61,42 +62,45 @@ class ScratchAutoencoder():
         updates = [(param, param - self.learning_rate * grad) for grad,param in zip(grads1, params)]
         
         monitorize = [theano.tensor.mean(Er_rec), a_rate * theano.tensor.mean(Er_clas), cost1]
-        self.f_train = theano.function([XX,YY,index], monitorize, updates=updates, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
+        self.f_train = theano.function([XX,YY,_learning_rate, index], monitorize, updates=updates, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: _learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
         self.f_monit = theano.function([XX, YY], monitorize, givens = {self.X: XX, self.y: YY}, on_unused_input='warn')
 
         params2 = [Wc,bc]
         cost_bp = theano.tensor.mean(a_rate * Er_clas)
         grads2 = theano.tensor.grad(cost_bp, params2)
         updates2 = [(param, param - self.learning_rate * grad) for grad,param in zip(grads2, params2)]
-        self.f_train_backpropagation = theano.function([XX,YY,index], monitorize, updates=updates2, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
+        self.f_train_backpropagation = theano.function([XX,YY,_learning_rate, index], monitorize, updates=updates2, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: _learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
 
         params3 = [We,be,Wd,bd]
         cost_aut = theano.tensor.mean(Er_rec)
         grads3 = theano.tensor.grad(cost_aut, params3)
         updates3 = [(param, param - self.learning_rate * grad) for grad,param in zip(grads3, params3)]
-        self.f_train_autoencoder = theano.function([XX,YY,index], monitorize, updates=updates3, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
+        self.f_train_autoencoder = theano.function([XX,YY,_learning_rate, index], monitorize, updates=updates3, givens = {self.X: XX[index*batch_size:(index+1)*batch_size,:], self.learning_rate: _learning_rate, self.y: YY[index*batch_size:(index+1)*batch_size,:]}, on_unused_input='warn')
+        self.f_monitorize_output_classifier = theano.function([X], h, givens = {self.X: X}, on_unused_input='warn')
+        #self.monit2 = theano.function([XX,YY], [h,self.y, theano.tensor.nnet.categorica_crossentropy(h,self.y)], givens = {self.X : XX , self.y : YY})
 
-
+    def monitorizeOutput(self,data):
+        return self.f_monitorize_output_classifier(data)
         #self.monit2 = theano.function([XX,YY], [h,self.y, theano.tensor.nnet.categorical_crossentropy(h,self.y)], givens = {self.X : XX , self.y : YY})
 
     def train_backpropagation(self, train_data, labels, batch_size, learning_rate): 
         a = []
         for i in range(len(train_data)/batch_size):
-            a.append(self.f_train_backpropagation(train_data,labels,i))        
+            a.append(self.f_train_backpropagation(train_data,labels,learning_rate, i))        
         print str(numpy.mean(numpy.array(a),axis=0))
         return numpy.mean(numpy.array(a),axis=0)
 
     def train_autoencoder(self, train_data, labels, batch_size, learning_rate): 
         a = []
         for i in range(len(train_data)/batch_size):
-            a.append(self.f_train_autoencoder(train_data,labels,i))        
+            a.append(self.f_train_autoencoder(train_data,labels,learning_rate,i))        
         print str(numpy.mean(numpy.array(a),axis=0))
         return numpy.mean(numpy.array(a),axis=0)
 
     def train(self, train_data, labels, batch_size, learning_rate): 
         a = []
         for i in range(len(train_data)/batch_size):
-            a.append(self.f_train(train_data,labels,i))        
+            a.append(self.f_train(train_data,labels,learning_rate,i))        
         print str(numpy.mean(numpy.array(a),axis=0))
         return numpy.mean(numpy.array(a),axis=0)
         
@@ -105,7 +109,6 @@ class ScratchAutoencoder():
         
     def reconstruct(self,data):
         return self._reconstruct(data)
-
 
 
 import cPickle
@@ -118,7 +121,8 @@ except:
     from numpy import array
     from dataset_utils.getData import getData
     from dataset_utils.GetTrainAndTestSets import getSignalsTrainTest
-    cases = holter_utils.get_usable_cases('cardiosManager')
+    #cases = holter_utils.get_usable_cases('cardiosManager')
+    cases = holter_utils.get_usable_cases('Jose_25_6_2012')
     ids_train, ids_test = getSignalsTrainTest(cases)
     beats_train, beats_test, labels_train, labels_test = getData(ids_train, ids_test)
 
@@ -143,84 +147,63 @@ for i in range(len(Y_train)):
         Y_train_def[i][1]=1  
     else:
         Y_train_def[i][0]=1  
-
+'''
+'''
 learning_rate = 0.01
 ac = 100
 batch_size = 128
 
 
 visible_size = X_train.shape[1]
-hidden_size = 300
+hidden_size = 240
 pa = ScratchAutoencoder(visible_size, hidden_size, ac, N_classes = 2)
 costs = []
+
+
+indexs_1 = [i for i,x in enumerate(Y_train_def) if x[1] == 1]
+indexs_0 = [i for i,x in enumerate(Y_train_def) if x[0] == 1]
+fine_tunning_beats = list(X_train[indexs_1,:])+list(X_train[indexs_0[:2500],:])
+fine_tunning_labels = list(Y_train_def[indexs_1,:])+list(Y_train_def[indexs_0[:2500],:])
+aa = zip(fine_tunning_beats, fine_tunning_labels)
+import random
+random.shuffle(aa)
+fine_tunning_beats, fine_tunning_labels = zip(*aa)
+
+
+def getMetric(pppp, data, labels):
+    #Y_train_def2 = [0 if x != 'V' else 1 for x in Y_train]
+    y_labels = [0 if x != 'V' else 1 for x in labels]
+    from sklearn.metrics import roc_curve
+    from sklearn import metrics
+    ssc = pppp.monitorizeOutput(data)
+    fpr, tpr, thresholds = roc_curve(y_labels, [x[0] for x in ssc])
+    print str(metrics.auc(fpr, tpr))
+
+
+
 
 print "LAYER 1"
 print "  -- step 1"
 for epoch in range(10):
     costs.append( pa.train_autoencoder(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
 print "  -- step 2"
+getMetric(pa, X_valid)
 for epoch in range(3):
     costs.append( pa.train_backpropagation(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
 print "  -- step 3"
+getMetric(pa, X_valid)
+for epoch in range(30):
+    costs.append( pa.train(numpy.matrix(numpy.array(fine_tunning_beats),dtype=numpy.float64), numpy.matrix(list(fine_tunning_labels),dtype=numpy.float64), batch_size, learning_rate))
+    #costs.append( pa.train(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate/500))
+    #getMetric(pa, X_valid)
+getMetric(pa, X_valid)
 for epoch in range(10):
-    costs.append( pa.train(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-
-
-visible_size2 = hidden_size
-hidden_size2 = 200
-pa2 = ScratchAutoencoder(visible_size2, hidden_size2, 1., N_classes = 2)
-costs2 = []
-print "LAYER 2"
-print "  -- step 1"
+    costs.append( pa.train(numpy.matrix(numpy.array(fine_tunning_beats),dtype=numpy.float64), numpy.matrix(list(fine_tunning_labels),dtype=numpy.float64), batch_size, learning_rate/10))
+    costs.append( pa.train(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate/10000))
+    getMetric(pa, X_valid)
 for epoch in range(10):
-    costs2.append( pa2.train_autoencoder(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-print "  -- step 2"
-for epoch in range(3):
-    costs2.append( pa2.train_backpropagation(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-print "  -- step 3"
-for epoch in range(10):
-    costs2.append( pa2.train(pa.project(numpy.matrix(X_train,dtype=numpy.float64)), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-
-
-visible_size3 = hidden_size2
-hidden_size3 = 100
-pa3 = ScratchAutoencoder(visible_size3, hidden_size3, 1., N_classes = 2)
-costs3 = []
-print "LAYER 3"
-print "  -- step 1"
-for epoch in range(10):
-    costs3.append( pa3.train_autoencoder(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64))), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-print "  -- step 2"
-for epoch in range(3):
-    costs3.append( pa3.train_backpropagation(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64))), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-print "  -- step 3"
-for epoch in range(10):
-    costs3.append( pa3.train(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64))), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-
-
-visible_size4 = hidden_size3
-hidden_size4 = 10
-pa4 = ScratchAutoencoder(visible_size4, hidden_size4, 1., N_classes = 2)
-costs2 = []
-print "LAYER 4"
-print "  -- step 1"
-for epoch in range(10):
-    costs.append( pa3.train_autoencoder(pa3.project(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64)))), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-print "  -- step 2"
-for epoch in range(3):
-    costs.append( pa2.train_backpropagation(pa3.project(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64)))), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-print "  -- step 3"
-for epoch in range(10):
-    costs2.append( pa2.train(pa3.project(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64)))), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate))
-
-
-
-
-import numpy
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import classification_report
-clf = KNeighborsClassifier(n_neighbors = 10)
-clf.fit(pa2.project(pa.project(numpy.matrix(X_train,dtype=numpy.float64))), Y_train)
-pred = clf.predict(pa2.project(pa.project(numpy.matrix(X_valid, dtype=numpy.float64))))
-print classification_report(pred, Y_valid)
+    costs.append( pa.train(numpy.matrix(numpy.array(fine_tunning_beats),dtype=numpy.float64), numpy.matrix(list(fine_tunning_labels),dtype=numpy.float64), batch_size, learning_rate/100))
+    costs.append( pa.train(numpy.matrix(X_train,dtype=numpy.float64), numpy.matrix(Y_train_def,dtype=numpy.float64), batch_size, learning_rate/100000))
+    getMetric(pa, X_valid)
+'''
 
